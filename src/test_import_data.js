@@ -13,13 +13,16 @@ const map = L.map('map', {
 // C'est suffisant pour ton POC hors Vue.
 
 // Orthophoto SWISSIMAGE (fond de carte)
-const swissimage = L.tileLayer(
-  'https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg',
-  {
-    attribution: '© swisstopo, © geo.admin.ch',
-    maxZoom: 19
-  }
-);
+const swissimageCurrent = L.tileLayer('https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/current/3857/{z}/{x}/{y}.jpeg', { attribution: '© swisstopo' });
+const swissimage2010 = L.tileLayer('https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissimage/default/2010/3857/{z}/{x}/{y}.jpeg', { attribution: '© swisstopo' });
+
+    
+const baseMaps = {
+  "Actuel": swissimageCurrent,
+  "Année 2010": swissimage2010
+};
+
+L.control.layers(baseMaps).addTo(map);
 
 const swissaltiRelief = L.tileLayer(
   'https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissalti3d-reliefschattierung/default/current/3857/{z}/{x}/{y}.png',
