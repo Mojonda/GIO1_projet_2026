@@ -1,192 +1,114 @@
 <template>
-  <div class="container">
+  <div class="app-wrapper">
     <div class="controls">
       <h3>Voyage dans le temps</h3>
-      <p class="subtitle">Orthophotos WMTS 1926-2025</p>
+      <p class="subtitle">Vue synchronisée 2D & 3D</p>
       
       <button 
-        @click="setYear('2025')" 
-        :class="{ active: currentYear === '2025' }">
-        📸 2025 (actuel)
-      </button>
-      
-      <button 
-        @click="setYear('2023')" 
-        :class="{ active: currentYear === '2023' }">
-        📸 2023
-      </button>
-      
-      <button 
-        @click="setYear('2020')" 
-        :class="{ active: currentYear === '2020' }">
-        📸 2020
-      </button>
-      
-      <button 
-        @click="setYear('2010')" 
-        :class="{ active: currentYear === '2010' }">
-        📸 2010
-      </button>
-      
-      <button 
-        @click="setYear('2000')" 
-        :class="{ active: currentYear === '2000' }">
-        📸 2000
-      </button>
-      
-      <button 
-        @click="setYear('1990')" 
-        :class="{ active: currentYear === '1990' }">
-        📸 1990
-      </button>
-      
-      <button 
-        @click="setYear('1946')" 
-        :class="{ active: currentYear === '1946' }">
-        🖤 HIST 1946
+        v-for="year in years" 
+        :key="year.id"
+        @click="currentYear = year.id"
+        :class="{ active: currentYear === year.id }">
+        {{ year.label }}
       </button>
 
       <div class="footer-info">
-        <small>© swisstopo | ch.swisstopo.swissimage-product</small>
+        <small>© swisstopo</small>
       </div>
     </div>
 
-    <div id="map"></div>
+    <div class="viewer-container">
+      <div class="map-box border-right">
+        <div class="label-overlay">Vue 2D (Leaflet)</div>
+        <Map2D :year="currentYear" />
+      </div>
+      
+      <div class="map-box">
+        <div class="label-overlay">Vue 3D (Cesium)</div>
+        <Map3D :year="currentYear" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import { ref } from 'vue';
+import Map2D from './components/Map2D.vue'; // Ton fichier actuel renommé
+import Map3D from './components/3D.vue';
 
 const currentYear = ref('2025');
-let map = null;
-let tileLayer = null;
 
-const setYear = (year) => {
-  currentYear.value = year;
-  
-  if (tileLayer) {
-    map.removeLayer(tileLayer);
-  }
-
-  // URL WMTS officielle avec {Time} de ton GetCapabilities
-  const time = year === '1946' ? '1946' : year;
-  const layerId = year === '1946' ? 'ch.swisstopo.swissimage-product_1946' : 'ch.swisstopo.swissimage-product';
-  
-  const url = `https://wmts.geo.admin.ch/1.0.0/${layerId}/default/${time}/3857/{z}/{x}/{y}.jpeg`;
-
-  tileLayer = L.tileLayer(url, {
-    attribution: '&copy; <a href="https://www.swisstopo.admin.ch/">swisstopo</a>',
-    maxZoom: 20,
-    minZoom: 2,
-    tileSize: 256
-  });
-
-  tileLayer.addTo(map);
-};
-
-onMounted(() => {
-  // Centre sur Lausanne/Yverdon
-  map = L.map('map', {
-    center: [46.7785, 6.6412],
-    zoom: 16
-  });
-
-  setYear('2025');
-  
-  // Force resize après montage
-  setTimeout(() => {
-    map.invalidateSize();
-  }, 400);
-});
+const years = [
+  { id: '2025', label: '📸 2025 (actuel)' },
+  { id: '2023', label: '📸 2023' },
+  { id: '2020', label: '📸 2020' },
+  { id: '2010', label: '📸 2010' },
+  { id: '2000', label: '📸 2000' },
+  { id: '1990', label: '📸 1990' },
+  { id: '1946', label: '🖤 HIST 1946' }
+];
 </script>
 
 <style>
+/* Reset global */
 html, body, #app { 
-  margin: 0; 
-  padding: 0; 
-  height: 100%; 
-  width: 100%; 
-  overflow: hidden; 
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden;
+  font-family: sans-serif;
 }
 
-.container { 
-  position: relative; 
-  width: 100%; 
-  height: 100vh; 
+.app-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
 }
 
-#map { 
-  width: 100%; 
-  height: 100%; 
-  background-color: #f0f0f0; 
+.viewer-container {
+  display: flex;
+  flex: 1; /* Prend tout l'espace sous les contrôles si besoin, ou tout l'écran */
+  height: 100%;
 }
 
+.map-box {
+  flex: 1;
+  position: relative;
+  background: #eee;
+}
+
+.border-right {
+  border-right: 2px solid #333;
+}
+
+.label-overlay {
+  position: absolute;
+  top: 10px;
+  left: 50px; /* Pour ne pas cacher les boutons de zoom Leaflet */
+  z-index: 1001;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  pointer-events: none;
+}
+
+/* Ton style de contrôle existant adapté */
 .controls {
   position: absolute; 
-  top: 20px; 
-  right: 20px; 
-  z-index: 1000;
-  background: rgba(255, 255, 255, 0.95);
-  padding: 20px; 
-  border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15); 
-  width: 220px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.2);
-}
-
-h3 { 
-  margin: 0 0 8px 0; 
-  font-size: 1.2rem; 
-  color: #333; 
-  font-weight: 600;
-}
-
-.subtitle { 
-  margin: 0 0 20px 0; 
-  font-size: 0.85rem; 
-  color: #666; 
-  font-style: italic;
+  top: 20px; right: 20px; z-index: 2000;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px; border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  width: 200px;
 }
 
 button {
-  display: block; 
-  width: 100%; 
-  padding: 12px 10px; 
-  margin-bottom: 10px;
-  border: 2px solid #e0e0e0; 
-  border-radius: 8px; 
-  background: white;
-  cursor: pointer; 
-  font-weight: 500; 
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
-  text-align: left;
+  display: block; width: 100%; padding: 8px; margin-bottom: 5px;
+  border: 1px solid #ccc; border-radius: 6px; cursor: pointer;
+  text-align: left; background: white;
 }
 
-button.active { 
-  background: linear-gradient(135deg, #007bff, #0056b3); 
-  color: white; 
-  border-color: #007bff; 
-  box-shadow: 0 4px 12px rgba(0,123,255,0.3);
-  transform: translateY(-1px);
-}
-
-button:hover:not(.active) { 
-  background: #f8f9ff; 
-  border-color: #007bff;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.footer-info { 
-  margin-top: 15px; 
-  font-size: 0.75rem; 
-  color: #999; 
-  text-align: center; 
-  font-style: italic;
+button.active {
+  background: #007bff; color: white; border-color: #0056b3;
 }
 </style>
