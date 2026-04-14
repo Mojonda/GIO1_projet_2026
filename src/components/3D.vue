@@ -17,34 +17,33 @@ let currentImageryLayer = null;
 /**
  * Mise à jour de l'imagerie swisstopo
  */
+
+
 const updateImagery = async (year) => {
   if (!viewer) return;
-  if (currentImageryLayer) viewer.imageryLayers.remove(currentImageryLayer);
-
-  const layerId = year === '1946' ? 'ch.swisstopo.swissimage-product_1946' : 'ch.swisstopo.swissimage-product';
   
+  // On retire l'ancienne couche
+  if (currentImageryLayer) {
+    viewer.imageryLayers.remove(currentImageryLayer);
+  }
+
   const provider = new Cesium.UrlTemplateImageryProvider({
-    url: `https://wmts.geo.admin.ch/1.0.0/${layerId}/default/${year}/3857/{z}/{x}/{y}.jpeg`,
+    url: `https://wmts.geo.admin.ch/1.0.0/ch.swisstopo.swissimage-product/default/${year}/3857/{z}/{x}/{y}.jpeg`,
     maximumLevel: 19
   });
 
   currentImageryLayer = viewer.imageryLayers.addImageryProvider(provider);
 };
 
-/**
- * LA FONCTION CRUCIALE : Synchronisation dynamique du zoom
- */
-const flyTo = (lat, lng, zoomLevel) => {
-  if (!viewer) return;
 
-  // FORMULE DE CONVERSION ZOOM -> ALTITUDE
-  // Cette formule assure que la 3D affiche la même largeur de terrain que la 2D
+const flyTo = (lat, lng, zoomLevel) => {  // FORMULE DE CONVERSION ZOOM -> ALTITUDE
+  if (!viewer) return;
   const altitude = 100000 / Math.pow(2, zoomLevel - 3);
 
   viewer.camera.flyTo({
     destination: Cesium.Cartesian3.fromDegrees(lng, lat, altitude + 8000),
     orientation: {
-      pitch: Cesium.Math.toRadians(-90), // Vue verticale parfaite pour comparer
+      pitch: Cesium.Math.toRadians(-90), 
       heading: 0,
       roll: 0
     },
@@ -70,14 +69,11 @@ onMounted(async () => {
       navigationHelpButton: false,
     });
 
-    // On cache le logo/crédit par défaut pour un look épuré
-    if (viewer.cesiumWidget.creditContainer) {
-      viewer.cesiumWidget.creditContainer.style.display = 'none';
-    }
+
 
     await updateImagery(props.year);
 
-    // Vue initiale par défaut
+    // Vue initiale (Yverdon les bains)
     flyTo(46.7785, 6.6412, 16);
 
   } catch (err) {

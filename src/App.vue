@@ -60,67 +60,43 @@
 </template>
 
 <script setup>
+
 import { ref, computed } from 'vue';
 import Map2D from './components/Map2D.vue';
 import Map3D from './components/3D.vue';
 
-// Références aux composants pour appeler leurs fonctions flyTo
+// Références pour la fonction flyTo 
 const map2dComponent = ref(null);
 const map3dComponent = ref(null);
 
-const years = [
-  { id: '1926', label: '1926' }, { id: '1927', label: '1927' }, { id: '1929', label: '1929' },
-  { id: '1930', label: '1930' }, { id: '1931', label: '1931' }, { id: '1932', label: '1932' },
-  { id: '1933', label: '1933' }, { id: '1934', label: '1934' }, { id: '1935', label: '1935' },
-  { id: '1936', label: '1936' }, { id: '1937', label: '1937' }, { id: '1938', label: '1938' },
-  { id: '1939', label: '1939' }, { id: '1940', label: '1940' }, { id: '1941', label: '1941' },
-  { id: '1942', label: '1942' }, { id: '1943', label: '1943' }, { id: '1944', label: '1944' },
-  { id: '1945', label: '1945' }, { id: '1946', label: '1946' }, { id: '1947', label: '1947' },
-  { id: '1948', label: '1948' }, { id: '1949', label: '1949' }, { id: '1950', label: '1950' },
-  { id: '1951', label: '1951' }, { id: '1952', label: '1952' }, { id: '1953', label: '1953' },
-  { id: '1954', label: '1954' }, { id: '1955', label: '1955' }, { id: '1956', label: '1956' },
-  { id: '1957', label: '1957' }, { id: '1958', label: '1958' }, { id: '1959', label: '1959' },
-  { id: '1960', label: '1960' }, { id: '1961', label: '1961' }, { id: '1962', label: '1962' },
-  { id: '1963', label: '1963' }, { id: '1964', label: '1964' }, { id: '1965', label: '1965' },
-  { id: '1966', label: '1966' }, { id: '1967', label: '1967' }, { id: '1968', label: '1968' },
-  { id: '1969', label: '1969' }, { id: '1970', label: '1970' }, { id: '1971', label: '1971' },
-  { id: '1972', label: '1972' }, { id: '1973', label: '1973' }, { id: '1974', label: '1974' },
-  { id: '1975', label: '1975' }, { id: '1976', label: '1976' }, { id: '1977', label: '1977' },
-  { id: '1978', label: '1978' }, { id: '1979', label: '1979' }, { id: '1980', label: '1980' },
-  { id: '1981', label: '1981' }, { id: '1982', label: '1982' }, { id: '1983', label: '1983' },
-  { id: '1984', label: '1984' }, { id: '1985', label: '1985' }, { id: '1986', label: '1986' },
-  { id: '1987', label: '1987' }, { id: '1988', label: '1988' }, { id: '1989', label: '1989' },
-  { id: '1990', label: '1990' }, { id: '1991', label: '1991' }, { id: '1992', label: '1992' },
-  { id: '1993', label: '1993' }, { id: '1994', label: '1994' }, { id: '1995', label: '1995' },
-  { id: '1996', label: '1996' }, { id: '1997', label: '1997' }, { id: '1998', label: '1998' },
-  { id: '1999', label: '1999' }, { id: '2000', label: '2000' }, { id: '2001', label: '2001' },
-  { id: '2002', label: '2002' }, { id: '2003', label: '2003' }, { id: '2004', label: '2004' },
-  { id: '2005', label: '2005' }, { id: '2006', label: '2006' }, { id: '2007', label: '2007' },
-  { id: '2008', label: '2008' }, { id: '2009', label: '2009' }, { id: '2010', label: '2010' },
-  { id: '2011', label: '2011' }, { id: '2012', label: '2012' }, { id: '2013', label: '2013' },
-  { id: '2014', label: '2014' }, { id: '2015', label: '2015' }, { id: '2016', label: '2016' },
-  { id: '2017', label: '2017' }, { id: '2018', label: '2018' }, { id: '2019', label: '2019' },
-  { id: '2020', label: '2020' }, { id: '2021', label: '2021' }, { id: '2022', label: '2022' },
-  { id: '2023', label: '2023' }, { id: '2024', label: '2024' }, { id: '2025', label: '2025' }
-];
+// Tableau des années, de 1926 à 2025 
 
-// Zones d'intérêt converties en WGS84
+const startYear = 1926;
+const endYear = 2025;
+
+const years = Array.from({ length: endYear - startYear + 1 }, (_, i) => {
+  const year = (startYear + i).toString();
+  return { id: year, label: year };
+});
+
+// Zones d'intérêt en WGS84
+
 const pointsOfInterest = [
-  { name: "Bulle", lat: 46.6212, lng: 7.0578, zoom: 16 },
+  { name: "Bulle", lat: 46.6212, lng: 7.0578, zoom: 14 },
   { name: "Glacier Aletsch", lat: 46.4312, lng: 8.0685, zoom: 14 },
-  { name: "Grande Dixence", lat: 46.0805, lng: 7.4025, zoom: 16 },
-  { name: "Gravière de Bioley-Orjulaz", lat: 46.6165, lng: 6.5815, zoom: 17 },
-  { name: "Aéroport de Genève", lat: 46.2370, lng: 6.1091, zoom: 15 },
-  { name: "Bure", lat: 47.4385, lng: 7.0095, zoom: 15 }
+  { name: "Grande Dixence", lat: 46.0805, lng: 7.4025, zoom: 14 },
+  { name: "Gravière de Bioley-Orjulaz", lat: 46.6165, lng: 6.5815, zoom: 14 },
+  { name: "Aéroport de Genève", lat: 46.2370, lng: 6.1091, zoom: 14 },
+  { name: "Bure", lat: 47.4385, lng: 7.0095, zoom: 14 }
 ];
 
 const index2D = ref(years.length - 1);
-const index3D = ref(years.findIndex(y => y.id === '1946'));
+const index3D = ref(years.length -1);
 
-const year2D = computed(() => years[index2D.value].id);
+const year2D = computed(() => years[index2D.value].id);  // récuperation de l'ID de l'année
 const year3D = computed(() => years[index3D.value].id);
 
-// Fonction pour déplacer les deux vues vers un lieu choisi
+// Fonction pour déplacer les deux vues vers un lieu d'intéret
 const goToLocation = (event) => {
   const poi = pointsOfInterest.find(p => p.name === event.target.value);
   if (poi) {
@@ -130,15 +106,11 @@ const goToLocation = (event) => {
 };
 
 const handleSync = (data) => {
-  // Debug pour voir si l'objet contient bien le zoom dans ta console (F12)
-  console.log("Sync reçu :", data); 
-
   if (map3dComponent.value && data) {
-    // On passe bien les 3 propriétés de l'objet data
+    // Synchronisation de la vue 3D avec les coordonnées et le zoom reçus
     map3dComponent.value.flyTo(data.lat, data.lng, data.zoom);
   }
 };
-
 
 </script>
 
