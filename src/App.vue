@@ -45,13 +45,11 @@
     </div>
 
     <div class="viewer-container">
-      <div class="map-box border-right">
-        <div class="label-overlay overlay-left">2D : {{ year2D }}</div>
+      <div class="map-box border-right">        
         <Map2D :year="year2D" @sync-3d="handleSync" ref="map2dComponent" />
       </div>
       
-      <div class="map-box">
-        <div class="label-overlay overlay-right">3D : {{ year3D }}</div>
+      <div class="map-box">       
         <Map3D :year="year3D" ref="map3dComponent" />
         <div class="tech-indicator">Powered by CesiumJS</div>
       </div>
@@ -115,7 +113,7 @@ const pointsOfInterest = [
 ];
 
 const index2D = ref(years.length - 1);
-const index3D = ref(years.findIndex(y => y.id === '1946'));
+const index3D = ref(years.length - 1);
 
 const year2D = computed(() => years[index2D.value].id);
 const year3D = computed(() => years[index3D.value].id);
@@ -171,30 +169,18 @@ html, body, #app {
   border-right: 3px solid #333;
 }
 
-/* Badges Années */
-.overlay-left {
-  position: absolute; top: 15px; left: 15px; z-index: 1001;
-  background: rgba(0, 0, 0, 0.7); color: white; padding: 5px 12px;
-  border-radius: 20px; font-size: 0.9rem; pointer-events: none; text-transform: uppercase;
-}
-
-.overlay-right {
-  position: absolute; top: 15px; right: 15px; z-index: 1001;
-  background: rgba(0, 0, 0, 0.7); color: white; padding: 5px 12px;
-  border-radius: 20px; font-size: 0.9rem; pointer-events: none; text-transform: uppercase;
-}
 
 /* Menu Central */
 .central-menu {
-  position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-  z-index: 2000; background: rgba(255, 255, 255, 0.95); padding: 15px 25px;
-  border-radius: 35px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-  width: auto; min-width: 550px; backdrop-filter: blur(10px); text-align: center;
+  position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+  z-index: 2000; background: rgba(255, 255, 255, 0.95); padding: 1px 10px;
+  border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  width: auto; min-width: 400px; backdrop-filter: blur(10px); text-align: center;
 }
 
 .poi-container { margin: 10px 0 15px 0; }
 .poi-select {
-  width: 100%; padding: 8px 15px; border-radius: 20px; border: 1px solid #ddd;
+  width: 100%; padding: 5px 15px; border-radius: 20px; border: 1px solid #ddd;
   background: #f9f9f9; font-size: 0.9rem; cursor: pointer; outline: none;
 }
 
@@ -205,13 +191,12 @@ h3 { margin: 0; font-size: 1rem; color: #333; }
 .slider-group { flex: 1; }
 .slider-group label { display: block; font-size: 0.9rem; margin-bottom: 5px; }
 
-.vertical-separator { width: 1px; height: 40px; background: #ddd; }
+.vertical-separator { width: 1px; height: 10px; background: #ddd; }
 
 input[type="range"] { width: 100%; cursor: pointer; }
-.2d-accent label strong { color: #007bff; }
-.3d-accent label strong { color: #e67e22; }
 
-.footer-info { margin-top: 8px; font-size: 0.7rem; color: #bbb; }
+
+.footer-info { margin-top: 0px; font-size: 0.7rem; color: #bbb; }
 .tech-indicator {
   position: absolute; bottom: 10px; right: 10px; z-index: 1001;
   font-size: 10px; color: rgba(255, 255, 255, 0.4); text-transform: uppercase;

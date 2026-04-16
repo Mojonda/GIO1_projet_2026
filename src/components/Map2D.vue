@@ -135,11 +135,11 @@ onMounted(() => {
   color: #333;
   border: 2px solid #007bff;
   border-radius: 25px;
-  padding: 15px 30px;
+  padding: 5px 10px;
   
   font-family: inherit;
   font-weight: 600;
-  font-size: 1.4rem;
+  font-size: 1rem;
   cursor: pointer;
   
   box-shadow: 0 4px 15px rgba(0,0,0,0.2);
